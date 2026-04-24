@@ -1,0 +1,74 @@
+# See docs at: https://mystmd.org/guide/frontmatter
+version: 1
+project:
+  title: Teledetección aplicada a la restauración de espacios naturales
+  description: Material didáctico correspondiente a la Microcredencial en Inteligencia Artificial y Tecnologías Geoespaciales aplicadas a la Restauración de Ecosistemas Forestales afectados por incendios y sequías extremas.
+  keywords:
+      - MyST Markdown
+      - pyTSEB
+      - ProspectD
+      - 4SAIL
+      - Remote Sensing
+      - Copernicus
+  authors:
+      - name: Héctor Nieto
+        affiliation: 
+          - Instituto de Ciencias Agrarias
+          - CSIC
+        orcid: 0000-0003-4250-6424
+        email: hector.nieto@ica.csic.es
+      - name: María Burguet Marimón
+        affiliation: 
+          - Instituto de Ciencias Agrarias
+          - CSIC
+        orcid: 0000-0002-9748-8078
+      - name: Benjamin Mary
+        affiliation:
+          - Instituto de Ciencias Agrarias
+          - CSIC
+        orcid: 0000-0003-0815-842X
+  funding: Este material didáctico ha sido desarrollado gracias al proyecto GRwater – Programa Prismas y Problemas de la Fundación BBVA 2023
+  github: https://github.com/hectornieto/microcredencial-UCLM
+  jupyter:
+    binder:
+      repo: https://github.com/hectornieto/microcredencial-UCLM
+  open_access: true
+  license:
+    content: CC-BY-4.0
+  toc:
+    - file: intro.md
+    - file: dia-1.md
+      children:
+        - file: ./101-ES_radiacion_neta.md
+        - file: ./102-ES_espectro_vegetacion.md
+
+    - file: dia-2.md
+      children:
+        
+        - file: ./201-ES_turbulencia_y_calor_sensible.md
+    - file: dia-3.md
+      children:
+        - file: ./301-ES_parametros_biofisicos.md
+        - file: ./302-ES_SenET-OpenEO.md
+    
+  settings:
+    output_matplotlib_strings: remove
+    output_stderr: remove-warn 
+     
+  exports:
+    - format: pdf
+      template: lapreprint-typst
+      articles: intro.md
+  bibliography: 
+   - bibliografia.bib
+site:
+  template: book-theme
+  title: Libro digital sobre teledetección aplicada a la restauración de espacios naturales
+  options:
+    logo_text: Microcredencial UCLM
+    logo: ./input/figures/logo_main.png
+  nav: []
+  actions:
+    - title: Learn More
+      url: https://mystmd.org/guide
+  domains: []
