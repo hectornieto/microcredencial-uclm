@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from pyTSEB import TSEB
 from pyTSEB import MO_similarity as mo
 from pyTSEB import wind_profile as wind
@@ -27,13 +27,16 @@ FIGSIZE = (12.0, 6.0)
 
 np.seterr(all="ignore")
 DEFAULT_SITE = "ES-Hen"
-INPUT_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "input")
-OUTPUT_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output")
-METEO_FILE_PATH = os.path.join(INPUT_FOLDER, "eddy_covariance",
-                               f"FLX_{DEFAULT_SITE}_FLUXNET_FULLSET_HH_2019-2024_ICOS.csv")
-METEO_DAILY_FILE_PATH = os.path.join(INPUT_FOLDER, "eddy_covariance",
-                                     f"FLX_{DEFAULT_SITE}_FLUXNET_FULLSET_DD_2019-2024_ICOS.csv")
-LAI_FILE_PATH = os.path.join(INPUT_FOLDER, "canopy", f"{DEFAULT_SITE}_HLS-l2c.csv")
+INPUT_FOLDER = Path(__file__).absolute().parent.parent / "input"
+OUTPUT_FOLDER =Path(__file__).absolute().parent.parent / "mystorage" / "201-temperature_and_ET"
+METEO_FILE_PATH =INPUT_FOLDER / "eddy_covariance" / f"FLX_{DEFAULT_SITE}_FLUXNET_FULLSET_HH_2019-2024_ICOS.csv"
+METEO_DAILY_FILE_PATH = INPUT_FOLDER / "eddy_covariance" / f"FLX_{DEFAULT_SITE}_FLUXNET_FULLSET_DD_2019-2024_ICOS.csv"
+LAI_FILE_PATH = INPUT_FOLDER / "canopy" / f"{DEFAULT_SITE}_HLS-l2c.csv"
+
+site_data = INPUT_FOLDER / "sites.csv"
+site_data = pd.read_csv(site_data, sep=";")
+valid = site_data["SITE_ID"] == DEFAULT_SITE
+site_data = site_data.loc[valid]
 
 N_SIM = 50
 pet.ITERATIONS = 5
@@ -68,7 +71,7 @@ ZS = np.linspace(0, Z_U, N_SIM)
 US = np.linspace(0.50, 20, N_SIM)
 EMIS_C = 0.98
 EMIS_S = 0.94
-RES_FORM = [TSEB.KUSTAS_NORMAN_1999, {"KN_c": 0.0038}]
+RES_FORM = [TSEB.KUSTAS_NORMAN_1999, {}]
 # mean stomatal resistance, rsT, is taken as 400sm-1.  It follows from Eq. (19)
 # that, for a leaf area index, L , of 4, the bulk stomatal resistance is 50 sm-1
 RST_MIN = 400
@@ -86,13 +89,13 @@ VPD = 0.5 * met.calc_vapor_pressure(TAIR)  # mb
 # For bare soil zb is commonly taken as 0.01 m (see Van Bavel and Hillel 1976)
 Z0_SOIL = 0.01
 
-LAT_CND = 37.914998
-LON_CND = -3.227659
-STDLON_CND = 15.
-ELEV_CND = 366.0
+LAT_SITE = site_data["LOCATION_LAT"].item()
+LON_SITE = site_data["LOCATION_LONG"].item()
+STDLON_SITE = 15 * site_data["UTC_OFFSET"].item()
+ELEV_SITE = site_data["LOCATION_ELEV"].item()
 E_SURF = 0.98
-ZT_CND = 9
-ZU_CND = 9
+ZT_SITE = 10
+ZU_SITE = 10
 
 C_KC = [404.9, 79430.0]
 C_KO = [278.4, 36380.0]
@@ -141,7 +144,6 @@ METEO_DATA["NETRAD"] = METEO_DATA["SW_IN_F"] + METEO_DATA["LW_IN_F"] \
 METEO_DATA["DOY"] = METEO_DATA["TIMESTAMP"].dt.day_of_year
 METEO_DATA["TOD"] = METEO_DATA["TIMESTAMP"].dt.hour + METEO_DATA[
     "TIMESTAMP"].dt.minute / 60
-METEO_DATA["VPD_F"] = 10 * METEO_DATA["VPD_F"]
 METEO_DATA["PA_F"] = 10 * METEO_DATA["PA_F"]
 METEO_DATA["TA_F"] = METEO_DATA["TA_F"] + 273.15
 METEO_DATA["DATE"] = METEO_DATA["TIMESTAMP"].dt.date
@@ -149,7 +151,7 @@ E_SURF = 0.98
 METEO_DATA["LE"] = METEO_DATA["NETRAD"] - METEO_DATA["G_F_MDS"] - METEO_DATA["H_F_MDS"]
 METEO_DATA["LST"] = ((METEO_DATA['LW_OUT'] - (1. - E_SURF) * METEO_DATA['LW_IN_F']) / (
             rad.SB * E_SURF)) ** 0.25
-METEO_DATA['SZA'] = met.calc_sun_angles(LAT_CND, LON_CND, STDLON_CND,
+METEO_DATA['SZA'] = met.calc_sun_angles(LAT_SITE, LON_SITE, STDLON_SITE,
                                         METEO_DATA["DOY"], METEO_DATA["TOD"])[0]
 
 METEO_DATA = METEO_DATA.merge(LAI_DATA, on="DATE")
@@ -167,7 +169,6 @@ METEO_DAILY_DATA["NETRAD"] = METEO_DAILY_DATA["SW_IN_F"] + METEO_DAILY_DATA["LW_
 METEO_DAILY_DATA["DOY"] = METEO_DAILY_DATA["DATE"].dt.day_of_year
 
 # Convert pressure units to mb
-METEO_DAILY_DATA["VPD_F"] = 10 * METEO_DAILY_DATA["VPD_F"]
 METEO_DAILY_DATA["PA_F"] = 10 * METEO_DAILY_DATA["PA_F"]
 METEO_DAILY_DATA["TA_F"] = METEO_DAILY_DATA["TA_F"] + 273.15
 METEO_DAILY_DATA["ES"] = met.calc_vapor_pressure(METEO_DAILY_DATA["TA_F"])
@@ -180,8 +181,8 @@ METEO_DAILY_DATA["ET"] = met.flux_2_evaporation(METEO_DAILY_DATA["LE"],
                                                 24)
 
 f_cd = pet.calc_cloudiness(METEO_DAILY_DATA["SW_IN_F"],
-                           LAT_CND,
-                           ELEV_CND,
+                           LAT_SITE,
+                           ELEV_SITE,
                            METEO_DAILY_DATA["DOY"])
 
 
@@ -208,122 +209,127 @@ w_lai = w.FloatSlider(value=inv.MEAN_LAI,
                       min=MIN_LAI,
                       max=MAX_LAI,
                       step=0.1, description='LAI (m²/m²)',
-                      description_tooltip="Landscape Leaf Area Index",
+                      description_tooltip="Índice de Área Foliar",
                       **slide_kwargs)
-
+                      
+w_lai_range = w.FloatRangeSlider(min=0, max=10, value=[0, 4], step=0.1,
+                                 description='LAI', **slide_kwargs)
 w_leaf_angle = w.FloatSlider(value=57, min=1, max=90, step=1,
-                             description='LIDF (deg.)',
-                             description_tooltip="Dominmant leaf zenith angle",
+                             description='Ángulo hoja (º)',
+                             description_tooltip="Inclinación promedio de las hojas",
                              **slide_kwargs)
 
 w_sza = w.FloatSlider(value=37, min=0, max=89, step=1,
-                      description='SZA (deg.)',
-                      description_tooltip="Solar zenith angle",
+                      description='SZA (º)',
+                      description_tooltip="Ángulo cenital solar",
                       **slide_kwargs)
 
 w_saa = w.FloatSlider(value=180, min=0, max=359, step=1,
-                      description='SAA (deg.)',
-                      description_tooltip="Solar azimuth angle",
+                      description='SAA (º)',
+                      description_tooltip="Ángulo azimutal solar",
                       **slide_kwargs)
 
-w_hc = w.FloatSlider(min=0.01, max=8, value=4, step=0.01, description='$h_c$ (m)',
-                     description_tooltip="Canopy height",
+w_hc = w.FloatSlider(min=0.01, max=8, value=4, step=0.01, 
+                     description='$h_c$ (m)',
+                     description_tooltip="Altura dosel",
                      **slide_kwargs)
 
 w_hb_ratio = w.FloatSlider(min=0.0, max=0.9, value=0.5, step=0.01,
                            description="$h_{bottom}$ (--)",
-                           description_tooltip='Bottom of the canopy relative height',
+                           description_tooltip='Altura basal de copa',
                            **slide_kwargs)
 
 w_h_c_max = w.FloatSlider(min=0.1, max=0.9, value=0.5, step=0.01,
                           description='$h_{max}$ (--)',
-                          description_tooltip="Relative position within the canopy with the maximum leaf density",
+                          description_tooltip="Altura relativa del máximo de densidad foliar",
                           **slide_kwargs)
 
 w_wc = w.FloatSlider(min=0.1, max=3, value=1, step=0.01, description='Shape',
-                     description_tooltip="Canopy shape as the ratio between canopy width and canopy height",
+                     description_tooltip="Factor de forma (relación ancho/alto de copa",
                      **slide_kwargs)
 
 w_fc = w.FloatSlider(min=0.05, max=1, value=0.2, step=0.01,
                      description='$f_c$ (--)',
-                     description_tooltip='Canopy fraction',
+                     description_tooltip='Fracción de cobertura',
                      **slide_kwargs)
 
 w_interrow = w.FloatSlider(min=0.1, max=6, value=1, step=0.1,
                            description='L (m)',
-                           description_tooltip='Distance between rows',
+                           description_tooltip='Distancia entre hileras',
                            **slide_kwargs)
 
-w_psi = w.FloatSlider(min=-90., max=90, value=0, description='Orientación (deg.)',
-                      description_tooltip='Row azimuth angle',
+w_psi = w.FloatSlider(min=-90., max=90, value=0, 
+                      description='Orientación (º)',
+                      description_tooltip='Orientación de las hileras',
                       **slide_kwargs)
 
 w_skyl = w.FloatSlider(min=0, max=1, value=0.1, step=0.01,
                        description='Rad. difusa (--)',
-                       description_tooltip='Ratio of diffuse radiation',
+                       description_tooltip='Proporción de radiación difusa',
                        **slide_kwargs)
 
 w_leaf_abs = w.FloatSlider(min=0.8, max=1, value=0.9, step=0.01,
                            description='Abs. hoja',
-                           description_tooltip='Leaf absorptance',
+                           description_tooltip='Absortividad de la hoja',
                            **slide_kwargs)
 
 w_tair = w.FloatSlider(min=273, max=313, value=293, step=0.1,
                        description='T$_{aire}$ (K)',
-                       description_tooltip="Air temperature",
+                       description_tooltip="Temperatura del aire",
                        **slide_kwargs)
 
 w_hr = w.FloatSlider(min=0, max=100, value=50, step=0.1,
                      description='HR (%)',
-                     description_tooltip="Relative humidity",
+                     description_tooltip="Humedad Relativa",
                      **slide_kwargs)
 
 w_emiss = w.FloatSlider(min=0.9, max=0.99, value=0.98, step=0.01,
                         description=r'$\epsilon$',
-                        description_tooltip="Surface emissivity",
+                        description_tooltip="Emisividad de la superficie",
                         **slide_kwargs)
 
 w_lat = w.FloatSlider(min=0.0, max=90, value=40, step=1,
-                      description='Latitude (deg.)',
-                      description_tooltip="Site latitude",
+                      description='Latitud (º)',
+                      description_tooltip="Latitud",
                       **slide_kwargs)
 
-w_zol = w.FloatSlider(min=-1, max=1, value=0, step=0.01, description=r'$\xi$',
-                      description_tooltip="Atmospheric stability coefficient",
+w_zol = w.FloatSlider(min=-1, max=1, value=0, step=0.01, 
+                      description=r'$\xi$',
+                      description_tooltip="Coeficiente de estabilidad (negativo->inestabilidad, postivo->estabilidad)",
                       **slide_kwargs)
 
-w_u = w.FloatSlider(min=0.1, max=20, value=U, step=0.1, description='WS (m/s)',
-                    description_tooltip="Wind speed",
+w_u = w.FloatSlider(min=0.1, max=20, value=U, step=0.1, 
+                    description='WS (m/s)',
+                    description_tooltip="Velocidad del viento",
                     **slide_kwargs)
 
 w_r_ss = w.FloatSlider(min=0, max=10000, value=2000, step=100,
                        description='R$_{ss}$ (s/m)',
-                       description_tooltip="Resistance to vapour transport in the soil surface\n"
-                                           "Values closer to 0 indicate flooded soils\n"
-                                           "or higher topsoil moisture content",
+                       description_tooltip="Resistencia a la evaporación del suelo\n"
+                                           "0 --> suelo encharcado o saturado\n"
+                                           "100 --> capacidad de campo",
                                            **slide_kwargs)
 
 w_g_st = w.FloatSlider(min=0, max=0.5, value=GST_REF, step=0.001,
                        description='g$_{st}$ (mmol/m²s¹)',
-                       description_tooltip="Leaf stomata conductance\n"
-                                           "Values closer to 0 indicate larger water stress\n"
-                                           "or lower root-zone soil moisture content",
+                       description_tooltip="Conductancia estomática de la hoja\n"
+                                           "0 --> planta estresada/punto de marchitamiento",
                        **slide_kwargs)
 
 w_vza = w.FloatSlider(min=0, max=89, value=0, step=1,
-                      description='VZA (deg.)',
-                      description_tooltip="View zenith angle",
+                      description='VZA (º)',
+                      description_tooltip="Ángulo cenital de observación",
                       **slide_kwargs)
 
 w_ev = w.FloatSlider(min=0.97, max=1, value=0.99, step=0.001,
                      description=r'$\epsilon_V$',
-                     description_tooltip="Leaf emissivity",
+                     description_tooltip="Emisividad de la hoja",
                      readout_format='.3f',
                      **slide_kwargs)
 
 w_es = w.FloatSlider(min=0.90, max=1, value=0.97, step=0.001,
                      description=r'$\epsilon_S$',
-                     description_tooltip="Soil emissivity",
+                     description_tooltip="Emisividad del suelo",
                      readout_format='.3f',
                      **slide_kwargs)
 
@@ -331,17 +337,17 @@ dates = pd.date_range(METEO_DATA["DATE"].iloc[0], METEO_DATA["DATE"].iloc[-1], f
 date_opts = options = [(date.strftime('%d %b %Y'), date) for date in dates]
 w_dates = w.SelectionRangeSlider(options=date_opts,
                                  index=(0, len(date_opts) - 1),
-                                 description='Dates',
-                                 description_tooltip="Date range to be displayed in the timeseries",
+                                 description='Fechas',
+                                 description_tooltip="Rango de fechas a mostrar en la serie temporal",
                                  orientation='horizontal',
                                  layout={'width': '500px'},
                                  **slide_kwargs)
 
 w_stress = w.FloatSlider(min=0, max=1, value=0.5, step=0.01,
                          description='Stress (--)',
-                         description_tooltip='Crop-water stress index\n'
-                                             '0: No stress, water fully available to the plant\n'
-                                             '1: plant fully stressed, soil deficit above wilting point',
+                         description_tooltip='Índice de estrés hídrico\n'
+                                             '0: sin estrés, plantas con disponibilidad total de agua\n'
+                                             '1: planta totalmente estresada: punto de marchitamiento',
                          **slide_kwargs)
 
 
@@ -354,8 +360,8 @@ def plot_fveg(lai, leaf_angle=57):
     fig, axs = plt.subplots(figsize=FIGSIZE)
     axs.plot(VZAS, fc, 'r')
     axs.plot(VZAS, fc_sph, 'k--', label='Spherical')
-    axs.set_xlabel('VZA (degrees)')
-    axs.set_ylabel('Crop Fraction Observed by the Sensor')
+    axs.set_xlabel('VZA (º)')
+    axs.set_ylabel('Fracción de vegetación observada por el sensor')
     axs.set_ylim((0, 1.05))
     axs.set_xlim((0, 90))
     axs.legend(loc='lower right')
@@ -424,16 +430,16 @@ def wind_profile_heterogeneous(zol, lai, h_c, hb_ratio=0.5, h_c_max=0.5):
     axs[0].plot(f_a, np.linspace(0, h_c, np.size(f_a)))
     axs[0].set_ylim((0, h_c))
     axs[0].set_xlim((0, None))
-    axs[0].set_xlabel('Foliar density')
-    axs[0].set_ylabel('Height above ground (m)')
+    axs[0].set_xlabel('Densidad foliar')
+    axs[0].set_ylabel('Altura sobre el terreno (m)')
 
-    axs[1].plot(u_z, ZS, 'b', label="Wind profile heterogeneous")
-    axs[1].plot(u_z_0, ZS, 'b--', label="Wind profile homogeneous")
+    axs[1].plot(u_z, ZS, 'b', label="Perfil del viento, dosel heterogéneo")
+    axs[1].plot(u_z_0, ZS, 'b--', label="Perfil del viento, dosel homogéneo")
     # Plot the ufriction wind canopy
     axs[1].plot(u_c, h_c, marker='*', markerfacecolor="none", markeredgecolor="blue",
                 ms=12, ls="None", label='$u_c$')
 
-    axs[1].plot(u_z_ref, ZS, 'k--', label="FAO56 reference profile")
+    axs[1].plot(u_z_ref, ZS, 'k--', label="Perfil de referencia de FAO56")
     # Plot the canopy windspeed according to the two different methods
     axs[1].legend(loc='upper left')
     axs[1].set_xlim((0, U))
@@ -465,9 +471,9 @@ def plot_aerodynamic_resistance(zol, h_c):
     fig, axs = plt.subplots(figsize=FIGSIZE)
     ra = calc_r_a(zol, h_c)
     axs.plot(US, ra, 'k')
-    axs.set_ylabel('Aerodynamic Resistance (s/m)')
+    axs.set_ylabel('Resistancia aerodinámica (s/m)')
     axs.set_ylim((0, 200))
-    axs.set_xlabel('Wind speed (m/s)')
+    axs.set_xlabel('Velocidad del viento (m/s)')
     axs.set_xlim((0, None))
     plt.tight_layout()
     plt.show()
@@ -536,13 +542,13 @@ def plot_resistances(lai, hc, l_mo, leaf_width, z0_soil, delta_t):
     axs[1].plot(US, rx, 'g', label='N14')
     axs[2].plot(US, rs, 'g', label='N14')
     axs[0].legend(bbox_to_anchor=(0, 1), loc=3, ncol=4)
-    axs[0].set_ylabel('Aerodynamie Resistance')
+    axs[0].set_ylabel('Resistencia aerodinámica de la superficie')
     axs[0].tick_params(axis='x', which='both', bottom='off', top='off',
                        labelbottom='off')
-    axs[1].set_ylabel('Canopy Resistance')
+    axs[1].set_ylabel('Resitencia aerodinámica de la copa')
     axs[1].tick_params(axis='x', which='both', bottom='off', top='off',
                        labelbottom='off')
-    axs[2].set_ylabel('Soil Resistance')
+    axs[2].set_ylabel('Resitencia aerodinámica del suelo')
     axs[2].set_xlabel('Wind speed')
     axs[0].set_ylim((0, 200))
     axs[1].set_ylim((0, 200))
@@ -561,8 +567,8 @@ def plot_flux_variation(values, le, le_c, le_pm, le_fao, t_c, t_s, t_0,
                 ls="none",
                 label="ET$_{FAO56}$")
 
-    axs[1].plot(values, le_c / le, linestyle="-", color="green", label="Canopy")
-    axs[1].plot(values, 1 - le_c / le, linestyle="-", color="orange", label="Soil")
+    axs[1].plot(values, le_c / le, linestyle="-", color="green", label="Copa")
+    axs[1].plot(values, 1 - le_c / le, linestyle="-", color="orange", label="Suelo")
 
     axs[2].plot(values, t_0, linestyle="-", color="black", label="T$_0$ - T$_a$")
     axs[2].plot(values, t_c, linestyle="-", color="green", label="T$_c$ - T$_a$")
@@ -576,7 +582,7 @@ def plot_flux_variation(values, le, le_c, le_pm, le_fao, t_c, t_s, t_0,
     axs[2].legend()
     axs[0].set_ylabel("ET (mm / day)$)")
     axs[0].set_ylim(ET_LIMS)
-    axs[1].set_ylabel("Fraction of ET")
+    axs[1].set_ylabel("T/ET")
     axs[1].set_ylim((0, 1))
     axs[2].set_ylabel("T$_x$ - T$_a$ (K)")
     axs[2].set_ylim(DELTA_T_LIMS)
@@ -620,7 +626,7 @@ def fluxes_and_resistances(g_st=GST_REF, r_ss=2000, h_c=H_C_REF):
         z0_soil=Z0_SOIL,
         Rst_min=r_st,
         R_ss=r_ss,
-        resistance_form=[TSEB.KUSTAS_NORMAN_1999, {"KN_c": np.full(N_SIM, 0.0038)}],
+        resistance_form=RES_FORM,
         calcG_params=[[1], 0.35],
         leaf_type=1,
         verbose=False)
@@ -678,10 +684,10 @@ def get_land_surface_temperature(vza, leaf_angle, temperatures, e_v=0.98, e_s=0.
     lst[LAIS == 0] = t_s[LAIS == 0]
     fig, axs = plt.subplots(nrows=2, figsize=FIGSIZE, sharex=True)
     axs[0].plot(LAIS, fc, 'k-')
-    axs[0].set_ylabel('Crop Fraction Observed by the Sensor')
+    axs[0].set_ylabel('Fracción de vegetación observada por el sensor')
     axs[0].set_ylim((0, 1))
     axs[1].plot(LAIS, t_0, 'k-', label='T$_0$')
-    axs[1].plot(LAIS, lst, 'r-', label='LST simplified')
+    axs[1].plot(LAIS, lst, 'r-', label='LST simplificado')
     axs[1].plot(LAIS, bt_obs, 'r:', label='LST 4SAIL')
     axs[1].set_xlabel('LAI')
     axs[1].set_ylabel('LST')
@@ -899,7 +905,7 @@ def simulate_flux_timeseries(h_c, f_c, w_c, hb_ratio, h_c_max, leaf_angle, stres
         z0_soil=Z0_SOIL,
         Rst_min=r_st,
         R_ss=r_ss,
-        resistance_form=[TSEB.KUSTAS_NORMAN_1999, {"KN_c": np.full(dims, 0.0038)}],
+        resistance_form=RES_FORM,
         calcG_params=[[1], 0.35],
         leaf_type=1,
         massman_profile=[C_D_MASSMAN, f_a_cum],
@@ -960,14 +966,14 @@ def run_tseb(h_c, f_c, w_c, hb_ratio, h_c_max, leaf_angle):
         EMIS_S,
         z_0m,
         d_0,
-        np.full(dims, ZU_CND),
-        ZT_CND,
+        np.full(dims, ZU_SITE),
+        ZT_SITE,
         x_LAD=x_lad,
         f_c=f_c,
         w_C=w_c,
         leaf_width=LEAF_WIDTH,
         z0_soil=Z0_SOIL,
-        resistance_form=[TSEB.KUSTAS_NORMAN_1999, {"KN_c": np.full(dims, 0.0038)}],
+        resistance_form=RES_FORM,
         calcG_params=[[1], 0.35],
         verbose=False,
         massman_profile=[C_D_MASSMAN, f_a_cum]
@@ -1057,9 +1063,9 @@ def validate_fluxes(out_df, daily_df):
                    c='b', marker='o', label='H', s=6)
     axs[1].set_xlim(et_lims)
     axs[1].set_ylim(et_lims)
-    axs[1].set_xlabel(r'Estimated (mm/day)')
-    axs[1].set_ylabel(r'Observed (mm/day)')
-    axs[1].set_title('Daily ET')
+    axs[1].set_xlabel(r'Estimado (mm/day)')
+    axs[1].set_ylabel(r'Observado (mm/day)')
+    axs[1].set_title('ET diaria')
     axs[1].plot(et_lims, et_lims, 'k-')
     axs[1].grid()
     bias_le, mae_le, rmse_le = dc.error_metrics(METEO_DAILY_DATA["ET"].loc[dates],
@@ -1096,7 +1102,7 @@ def plot_flux_timeseries(date_range, df, daily_df, include_obs=False):
     axs[0].plot(df["TIMESTAMP"], df["NETRAD"], "k:", label="$R n$")
     axs[0].plot(df["TIMESTAMP"], df["LE"], "b", label=r"$\lambda E$")
     axs[0].set_ylim(FLUX_LIMS)
-    axs[0].set_ylabel("Flux (W/m²)")
+    axs[0].set_ylabel("Flujo (W/m²)")
     axs[0].legend()
     axs[1].plot(df["TIMESTAMP"], df["TA_F"] - 273.15, "k:", label="$T_{air}$")
     axs[1].plot(df["TIMESTAMP"], df["LST"] - 273.15, "r", label="LST")
@@ -1112,7 +1118,7 @@ def plot_flux_timeseries(date_range, df, daily_df, include_obs=False):
     secax.plot(daily_df["DATE"], daily_df["ET"], "b", label="ET")
     if include_obs:
         secax.plot(METEO_DAILY_DATA["DATE"], METEO_DAILY_DATA["ET"], "b:",
-                   label="Measured ET")
+                   label="ET estimada")
 
     secax.set_ylabel('ET')
     secax.set_ylim((0, 6))
@@ -1141,11 +1147,11 @@ def plot_kcs(dates, lais, et_ref, et, kcs):
     axs[1, 0].legend()
     axs[0, 0].set_ylabel("LAI")
     axs[0, 0].set_ylim((0, 4))
-    axs[1, 0].set_ylabel("ET (mm/day)")
+    axs[1, 0].set_ylabel("ET (mm/día)")
     axs[1, 0].set_ylim(ET_LIMS)
     axs[1, 0].xaxis.set_major_formatter(mdates.DateFormatter('%b'))
     axs[1, 0].xaxis.set_major_locator(mdates.MonthLocator(bymonth=range(1, 13, 3)))
-    axbig.set_ylabel("Crop coefficient")
+    axbig.set_ylabel("Coeficiente del cultivo")
     axbig.set_ylim((0., 2))
     axbig.set_xlabel("LAI")
     plt.tight_layout()
@@ -1165,13 +1171,13 @@ def crop_coefficients(g_st=GST_REF, r_ss=2000, h_c=H_C_REF, lai_range=(0, 5)):
     sn = METEO_DAILY_DATA["SW_IN_F"].values * (1. - 0.23)
     sn_s = sn * np.exp(-0.5 * lais)
     sn_c = sn - sn_s
-    r_st = 1. / (TSEB.res.molm2s1_2_ms1(tair, PRESS) * g_st)
-    ea = met.calc_vapor_pressure(METEO_DAILY_DATA["TA_F)"].values) - METEO_DAILY_DATA["VPD_F"].values
-    ldn = rad.calc_emiss_atm(METEO_DAILY_DATA["EA"].values, METEO_DAILY_DATA["TA_F)"].values) * met.calc_stephan_boltzmann(METEO_DAILY_DATA["TA_F)"].values)
+    r_st = 1. / (TSEB.res.molm2s1_2_ms1(METEO_DAILY_DATA["TA_F"], PRESS) * g_st)
+    ea = met.calc_vapor_pressure(METEO_DAILY_DATA["TA_F"].values) - METEO_DAILY_DATA["VPD_F"].values
+    ldn = METEO_DAILY_DATA["LW_IN_F"].values
     z_0m, d_0 = calc_roughness(np.full_like(sn, h_c))
 
     [_, t_s, t_c, _, _, _, le, _, le_c, *_] = pet.shuttleworth_wallace(
-        METEO_DAILY_DATA["TA_F)"].values,
+        METEO_DAILY_DATA["TA_F"].values,
         METEO_DAILY_DATA["WS_F"].values,
         ea,
         PRESS,
@@ -1197,9 +1203,10 @@ def crop_coefficients(g_st=GST_REF, r_ss=2000, h_c=H_C_REF, lai_range=(0, 5)):
 
     et = met.flux_2_evaporation(le, t_k=TAIR, time_domain=24)
     kcs_sw = et / METEO_DAILY_DATA["ET_REF"].values
-    out_file = os.path.join(OUTPUT_FOLDER, "lai_vs_kc.csv")
-    if not os.path.isdir(OUTPUT_FOLDER):
-        os.makedirs(OUTPUT_FOLDER)
+    out_file = OUTPUT_FOLDER / "lai_vs_kc.csv"
+    if not OUTPUT_FOLDER.is_dir():
+        OUTPUT_FOLDER.mkdir(parents=True)
+        
     result = pd.DataFrame({"LAI": lais, "Kc": kcs_sw})
     result.to_csv(out_file, index=False)
     plot_kcs(METEO_DAILY_DATA["DATE"], lais, METEO_DAILY_DATA["ET_REF"],

@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from pyTSEB import TSEB
 from pyTSEB import energy_combination_ET as pet
 from pyTSEB import meteo_utils as met
@@ -21,10 +21,10 @@ slide_kwargs = {"continuous_update": False}
 FIGSIZE = (12.0, 8.0)
 
 np.seterr(all="ignore")
-INPUT_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "input")
-OUTPUT_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output")
-SOIL_FOLDER = os.path.join(INPUT_FOLDER, "soil_spectral_library")
-ALBEDO_WEIGHT_FILE = os.path.join(INPUT_FOLDER, "albedo_weights.csv")
+INPUT_FOLDER = Path(__file__).absolute().parent.parent / "input"
+OUTPUT_FOLDER =Path(__file__).absolute().parent.parent / "mystorage" / "101-radiation_and_vegetation"
+SOIL_FOLDER = INPUT_FOLDER / "soil_spectral_library"
+ALBEDO_WEIGHT_FILE = INPUT_FOLDER / "albedo_weights.csv"
 N_SIM = 100
 pet.ITERATIONS = 5
 # Generate the list with VZAs (from 0 to 89)
@@ -97,8 +97,8 @@ w_saa = w.FloatSlider(value=180, min=0, max=359, step=1,
                       description_tooltip="Ángulo azimutal solar",
                       **slide_kwargs)
 
-SOIL_FILES = sorted(glob(os.path.join(SOIL_FOLDER, "*.txt")))
-SOIL_TYPES = [os.path.splitext(os.path.basename(i))[0] for i in SOIL_FILES]
+SOIL_FILES = sorted(list(SOIL_FOLDER.glob("*.txt")))
+SOIL_TYPES = [i.stem for i in SOIL_FILES]
 
 w_soil = w.Dropdown(options=SOIL_TYPES,
                     value=SOIL_TYPES[0],
@@ -474,7 +474,7 @@ def get_surface_spectra(cab, cw=inv.MEAN_CW, soil_type=SOIL_TYPES[0]):
                               inv.MEAN_CBROWN, cw, inv.MEAN_CM,
                               inv.MEAN_ANT)
 
-    rsoil = np.genfromtxt(os.path.join(SOIL_FOLDER, f"{soil_type}.txt"))
+    rsoil = np.genfromtxt(SOIL_FOLDER / f"{soil_type}.txt")
     rho_leaf.append(np.sum(r * ALBEDO_WEIGHTS["w_PAR"]))
     tau_leaf.append(np.sum(t * ALBEDO_WEIGHTS["w_PAR"]))
     rho_soil.append(np.sum(rsoil[:, 1] * ALBEDO_WEIGHTS["w_PAR"]))

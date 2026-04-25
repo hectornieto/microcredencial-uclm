@@ -206,10 +206,10 @@ Puedes ver que la mayor atenuación del viento ocurre en torno a la altura con m
 
 Como ya hemos comentado, la velocidad del viento y cómo éste se atenua tiene un efecto importante en cómo de eficiente es el transporte de calor y vapor de agua desde las distintas superficies (hojas y suelo) hacia la atmósfera, modificándose por tanto las resistencias al transporte de calor y vapor de agua.
 
-En la siguiente tarea podrás ver cómo la resistencia aerodinámica varía con la rugosidad de la superficie (o con la altura del dosel) y con la velocidad del viento. 
+En la siguiente tarea podrás ver cómo la resistencia aerodinámica varía con la rugosidad de la superficie (o con la altura del dosel) y con la velocidad del viento.
 
 ```{code-cell} ipython3
-w_ra = interactive(fn.plot_aerodynamic_resistance, zol=fixed(0), hc=fn.w_hc)
+w_ra = interactive(fn.plot_aerodynamic_resistance, zol=fixed(0), h_c=fn.w_hc)
 display(w_ra)
 ```
 
@@ -260,7 +260,7 @@ En balance, durante un día completo la atmósfera tiende siempre a la inestabil
 :::
 
 ```{code-cell} ipython3
-w_ra = interactive(fn.plot_aerodynamic_resistance, zol=fn.w_zol, hc=fn.w_hc)
+w_ra = interactive(fn.plot_aerodynamic_resistance, zol=fn.w_zol, h_c=fn.w_hc)
 display(w_ra)
 ```
 
@@ -451,7 +451,7 @@ En esta tarea vamos a evaluar cómo varía el coeficiente del cultivo en funció
 Para ello vamos a calcular la ET de referencia y la ET calculada por Shuttleworth-Wallaca para una serie temporal de datos meteorológicos de 4 años en el Valle Central de California. 
 
 :::{seealso} Ver también
-Puedes echar un ojo a los datos en la sucarpeta [./input/meteo/](./input/meteo/meteo_daily.csv).
+Puedes echar un ojo a los datos en la sucarpeta [./input/eddy_covariance/]({eval}`fn.METEO_FILE_PATH`).
 
 También puedes subir a esa carpeta tus propios datos meteo para correr tus simulaciones con las condiciones meteorológicas típicas de tu zona. Tan sólo asegúrante de reemplazar el archivo por tu propio archivo y mantener los nombres de las columnas tal y como están.
 :::
@@ -461,7 +461,7 @@ Puedes definir el tipo de cultivo de modo que puedas establecer su altura, su LA
 De este modo podemos series temporales sintéticas de ET, LAI y $K_c$ y ver cómo el $K_c$ se relaciona con el LAI.
 
 ```{code-cell} ipython3
-w_kc = interactive(fn.crop_coefficients, r_ss=fixed(5000), g_st=fn.w_g_st, h_c=fn.w_hc,
+w_kc = interactive(fn.crop_coefficients, r_ss=fixed(500), g_st=fn.w_g_st, h_c=fn.w_hc,
                    lai_range=fn.w_lai_range)
 display(w_kc)
 ```
