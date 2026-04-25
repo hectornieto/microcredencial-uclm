@@ -52,6 +52,11 @@ Como ejemplo ejectuta la siguiente celda para importar todas  las librerías nec
 from ipywidgets import interactive, fixed
 from IPython.display import display
 from functions import prosail_and_spectra as fn
+from pathlib import Path
+import numpy as np
+import pandas as pd
+import datetime as dt
+from model_evaluation import double_collocation as dc
 ```
 
 # Espectro de una hoja
@@ -159,7 +164,7 @@ Mira cómo cambia el espectro variando los valores del ángulo de observación c
 
 Haz variar el LAI, y ponlo en cero (sin vegetación). Comprueba que el espectro que sale es directamente el espectro del suelo. Ahora incrementa ligeramente el LAI, verás como el espectro va cambiando, disminuyendo la reflectividad en el rojo y azul (debido a la clorofila de la hoja), y aumentando la reflectividad en el *red-edge* y el NIR.
 
-Recuerda también de la [parte sobre la radiación neta](./101-ES_radiacion_neta.ipynb) el efecto que también tiene la disposición angular de las hojas. Con una observación al nadir (VZA=0) haz variar el ángulo típico de la hoja (`Leaf Angle`) desde un valor predominantemente horizontal (0º) a un ángulo predominantemente vertical (90º) 
+Recuerda también de la [parte sobre la radiación neta](./101-ES_radiacion_neta.ipynb) el efecto que también tiene la disposición angular de las hojas. Con una observación al nadir (VZA=0) haz variar el ángulo típico de la hoja (`Leaf Angle`) desde un valor predominantemente horizontal (0º) a un ángulo predominantemente vertical (90º)
 
 +++
 
@@ -262,7 +267,8 @@ Es posible que recibas un mensaje de aviso, no te preocupes, en principio todo d
 :::
 
 ```{code-cell} ipython3
-w_rho_sensor = interactive(fn.build_random_simulations, {"manual": True, "manual_name": "Generar simulaciones"},
+w_rho_sensor = interactive(fn.build_random_simulations, 
+                           {"manual": True, "manual_name": "Generar simulaciones"},
                            n_sim=fixed(5000), n_leaf_range=fn.w_range_nleaf,
                            cab_range=fn.w_range_cab, car_range=fn.w_range_car,
                            ant_range=fn.w_range_ant, cbrown_range=fn.w_range_cbrown, 
@@ -270,7 +276,8 @@ w_rho_sensor = interactive(fn.build_random_simulations, {"manual": True, "manual
                            lai_range=fn.w_range_lai, hotspot_range=fn.w_range_hotspot, 
                            leaf_angle_range=fn.w_range_leaf_angle, 
                            sza=fn.w_sza, vza=fn.w_vza, psi=fn.w_psi, 
-                           skyl=fn.w_skyl, soil_names=fn.w_soils, sensor=fn.w_sensor)
+                           tcwv=fn.w_tcwv, aot=fn.w_aot, soil_names=fn.w_soils, 
+                           sensor=fn.w_sensor)
 display(w_rho_sensor)
 ```
 
@@ -288,11 +295,89 @@ $$NDWI = \frac{\rho_{NIR} - \rho_{SWIR}}{\rho_{NIR} + \rho_{SWIR}}$$
 Esta misma formulación es utilizada por el NBR (Normalized Burn Ratio) que en algunos estudios se utiliza para evaluar la severidad de un incendio
 :::
 
-Las simulaciones se han guardado en un archivo prosail_simulations.csv en la carpeta [./output](./output/prosail_simulations.csv). Descargate este archivo y calcula distintos índices de vegetación e intenta desarrollar relaciones y modelos estadísticos entre las bandas o índices de vegetación y los parámetros biofísicos. Para ello puedes usar cualquier software con el que estés habituado a trabajar (Excel, R, SPSS, ...).
+Las simulaciones se han guardado en un archivo prosail_simulations.csv en la carpeta [./mystorage/102-prosail_and_spectra](/mystorage/102-prosail_and_spectra/{eval}`f"prosail_simulations_{fn.w_sensor.value}.txt"`). Descargate este archivo y calcula distintos índices de vegetación e intenta desarrollar relaciones y modelos estadísticos entre las bandas o índices de vegetación y los parámetros biofísicos. Para ello puedes usar cualquier software con el que estés habituado a trabajar (Excel, R, SPSS, ...).
 
 Puedes realizar tantas simulaciones como consideres necesarias,  por ejemplo variando el sensor o modificando los rangos plausibles para cubrir distintos tipos funcionales de vegetación. Tan sólo ten en cuenta que cada vez que se genere una simulación el archivo csv se sobreesecribirá. **Por lo que descárcatelo o haz una copia en tu carpeta virtual antes de volver a ejectura las nuevas simulaciones**.
 
-+++
+## Uso de modelos de Machine Learning como método de inversión
+En lugar de usar índices de vegetación, que suelen ser combinaciones matemáticas de apenas dos bandas, vamos en su lugar a usar toda la informacińo espectral y las simulaciones generadas por este modelo de base física para entrenar un modelo de aprendizaje automático que relacione cada uno de los parámetros biofísicos con todas las bandas simuladas de nuestro sensor.
+
+En este caso usaremos `Random Forest` para entrenar un modelo que luego, en un futuro pueda ser aplicado directamente a nuestras imágenes de teledetección.
+
+```{code-cell} ipython3
+from sklearn.ensemble import RandomForestRegressor as rf_sklearn
+from pypro4sail import machine_learning_regression as inv
+from matplotlib import pyplot as plt
+
+scikit_regressor_opts = {"n_estimators": 100,
+                         "min_samples_leaf": 1,
+                         "n_jobs": -1}
+
+sensor = fn.w_sensor.value
+out_file = fn.OUTPUT_FOLDER / f"prosail_simulations_{sensor}.csv"
+train_data = pd.read_csv(out_file, sep=",")
+
+
+print("Training a Random Forest for each parameners")
+reg = rf_sklearn(**scikit_regressor_opts)
+
+print("Buidling a testing simulated dataset with random noise in reflectances")
+params_orig = inv.build_prosail_database(fn.TEST_SIM,
+                                         distribution=inv.SALTELLI_DIST)
+
+soil_files = [Path(fn.SOIL_FOLDER) / f'{i}.txt' for i in fn.w_soils.value]
+soil_spectrum = fn.build_soil_database(params_orig["bs"], soil_files)
+soil_spectrum = np.clip(soil_spectrum, 1e-3, 1)
+
+# Compute the spectral proportion of diffuse radiation 
+skyl = fn.get_diffuse_radiation_6S(
+    fn.w_aot.value, fn.w_tcwv.value, fn.w_sza.value, fn.w_psi.value, 
+    dt.datetime.today(), altitude=0.1)
+
+print("Getting the sensor spectral response function")
+srf_file = Path(fn.SRF_FOLDER) / f"{fn.w_sensor.value}.txt"
+srfs = np.genfromtxt(srf_file, dtype=None, names=True)
+srf = []
+band_names = list(srfs.dtype.names[1:])
+for band in band_names:
+    srf.append(srfs[band])
+
+rho_canopy_vec = train_data[band_names]
+
+print(f"Running {params_orig['LAI'].size} simulations of ProspectD+4SAIL")
+rho_canopy_test, params_test = inv.simulate_prosail_lut(
+    params_orig, fn.WLS_SIM, soil_spectrum, skyl=fn.w_skyl.value, sza=fn.w_sza.value,
+    vza=fn.w_vza.value, psi=fn.w_psi.value, srf=srf, outfile=None, calc_FAPAR=False, reduce_4sail=True)
+
+print("Plotting the model evaluation")
+fig, axs = plt.subplots(ncols=2, nrows=4, figsize=(fn.FIGSIZE[0], 2*fn.FIGSIZE[1]))
+fig.supxlabel("Estimated")
+fig.supylabel("Observed")
+axs = axs.reshape(-1)
+for i, param in enumerate(fn.OBJ_PARAM_NAMES):
+    print(f"Training Random Forest Regression of {param}")
+    reg = reg.fit(rho_canopy_vec, train_data[param])
+    output = reg.predict(rho_canopy_test).reshape(-1)
+
+    cor, *_ = dc.agreement_metrics(params_test[param], output)
+    bias, mae, rmse = dc.error_metrics(params_test[param], output)
+    dc.density_plot(output, params_test[param], axs[i], s=1, rasterized=True)
+
+    absline = np.asarray([[np.amin(params_test[param]), np.amax(params_test[param])],
+                          [np.amin(params_test[param]), np.amax(params_test[param])]])
+
+    axs[i].plot(absline[0], absline[1], "k:")
+    axs[i].set_title(param)
+    error_text = f"bias: {bias:>6.3f}\n"\
+                 f"RMSE: {rmse:>6.3f}\n"\
+                 f"   r: {cor:>6.3f}"
+    
+    axs[i].text(0.05, 0.95, error_text, va="top", fontfamily="monospace", transform=axs[i].transAxes)
+
+plt.tight_layout()
+plt.savefig(Path(fn.OUTPUT_FOLDER) / f"prosail_{sensor}_model.png")
+plt.show()
+```
 
 # Conclusiones
 En esta práctica hemos visto cómo el espectro de la vegetación responde a las variables biofísicas de la superfice.
@@ -307,4 +392,3 @@ En esta práctica hemos visto cómo el espectro de la vegetación responde a las
 :::{tip} ¿Preguntas?
 ¿Algún comentario?
 :::
-

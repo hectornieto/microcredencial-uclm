@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from glob import glob
 import numpy as np
@@ -7,7 +6,6 @@ import matplotlib.pyplot as plt
 from pypro4sail import machine_learning_regression as inv
 from pypro4sail import four_sail as sail
 from pypro4sail import prospect as pro
-from sklearn.ensemble import RandomForestRegressor as rf_sklearn
 import ipywidgets as w
 from IPython.display import display, clear_output
 import datetime as dt
@@ -26,10 +24,10 @@ REGIONS = {"B": (400, 500), "G": (500, 600), "R": (600, 700),
                "R-E": (700, 800), "NIR": (800, 1100), "SWIR": (1100, 2500)}
 # Generate the list with VZAs (from 0 to 89)
 VZAS = np.arange(0, 90)
-INPUT_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "input")
-OUTPUT_FOLDER = os.path.join(os.path.dirname(os.path.dirname(__file__)), "output")
-SOIL_FOLDER = os.path.join(INPUT_FOLDER, "soil_spectral_library")
-SRF_FOLDER = os.path.join(INPUT_FOLDER, "sensor_response_functions")
+INPUT_FOLDER = Path(__file__).absolute().parent.parent / "input"
+OUTPUT_FOLDER =Path(__file__).absolute().parent.parent / "mystorage" / "102-prosail_and_spectra"
+SOIL_FOLDER = INPUT_FOLDER / "soil_spectral_library"
+SRF_FOLDER = INPUT_FOLDER / "sensor_response_functions"
 
 PARAM_DICT = {"N_leaf": inv.MEAN_N_LEAF,
               "Cab": inv.MEAN_CAB,
@@ -64,9 +62,8 @@ RANGE_DICT = {"N_leaf": (inv.MIN_N_LEAF, inv.MAX_N_LEAF),
 
 N_STEPS = 10
 
-soil_files = sorted(glob(os.path.join(SOIL_FOLDER, "*.txt")))
-soil_types = [os.path.splitext(os.path.basename(i))[0]
-                         for i in soil_files]
+soil_files = sorted(list(SOIL_FOLDER.glob("*.txt")))
+soil_types = [i.stem for i in soil_files]
 
 w_nleaf = w.FloatSlider(value=inv.MEAN_N_LEAF,
                         min=inv.MIN_N_LEAF,
@@ -196,8 +193,8 @@ w_range = w.FloatRangeSlider(value=RANGE_DICT["LAI"],
                              readout_format='.1f',
                              **slide_kwargs)
 
-srf_list = sorted(glob(os.path.join(SRF_FOLDER, "*.txt")))
-sensor_list = [os.path.splitext(os.path.basename(i))[0] for i in srf_list]
+srf_list = sorted(list(SRF_FOLDER.glob("*.txt")))
+sensor_list = [i.stem for i in srf_list]
 w_sensor = w.Dropdown(
     options=sensor_list, description='Sensor', value="Sentinel-2")
 
@@ -540,7 +537,7 @@ class ProSailSensitivity(object):
                                                     self.params["Ant"])
 
         lidf = sail.calc_lidf_campbell_vec(self.params["leaf_angle"])
-        rsoil = np.genfromtxt(os.path.join(SOIL_FOLDER, self.params["soil"]))
+        rsoil = np.genfromtxt(SOIL_FOLDER / self.params["soil"])
         # wl_soil=rsoil[:,0]
         rsoil_vec = np.tile(np.array(rsoil[:, 1]), (N_STEPS, 1))
 
@@ -613,7 +610,7 @@ def update_prospect_spectrum(N_leaf, Cab, Car, Ant, Cbrown, Cw, Cm):
 
 def update_soil_spectrum(soil_name):
     soil_file = "%s.txt"%soil_name
-    rsoil = np.genfromtxt(os.path.join(SOIL_FOLDER, soil_file))
+    rsoil = np.genfromtxt(SOIL_FOLDER / soil_file)
     plot_spectrum(rsoil[:, 0], rsoil[:, 1])
     return rsoil[:, 0], rsoil[:, 1]
 
@@ -626,9 +623,9 @@ def update_prosail_spectrum(N_leaf, Cab, Car, Ant, Cbrown, Cw, Cm,
     soil_file = "%s.txt"%soil_name
     wls, rho_leaf, tau_leaf = pro.prospectd(N_leaf, Cab, Car, Cbrown,
                                             Cw, Cm, Ant)
-    rsoil = np.genfromtxt(os.path.join(SOIL_FOLDER, soil_file))
+    rsoil = np.genfromtxt(SOIL_FOLDER / soil_file)
     rsoil = rsoil[:, 1]
-    lidf = sail.calc_lidf_campbell_vec(leaf_angle)
+    lidf = sail.calc_lidf_campbell(leaf_angle)
 
     [_,
      _,
@@ -760,7 +757,7 @@ def prosail_sensitivity(N_leaf, Cab, Car, Ant, Cbrown, Cw, Cm,
 
     lidf = sail.calc_lidf_campbell_vec(params["leaf_angle"])
     soil_file = "%s.txt"%soil_name
-    rsoil = np.genfromtxt(os.path.join(SOIL_FOLDER, soil_file))
+    rsoil = np.genfromtxt(SOIL_FOLDER / soil_file)
     # wl_soil=rsoil[:,0]
     rsoil_vec = np.tile(np.array(rsoil[:, 1]), (N_STEPS, 1))
 
@@ -803,7 +800,7 @@ def prosail_sensitivity(N_leaf, Cab, Car, Ant, Cbrown, Cw, Cm,
 
 def sensor_sensitivity(sensor, spectra):
 
-    srf_file = os.path.join(SRF_FOLDER, sensor + ".txt")
+    srf_file = SRF_FOLDER / f"{sensor}.txt"
     srfs = np.genfromtxt(srf_file, dtype=None, names=True)
     srf = []
     wls = srfs["SR_WL"]
@@ -920,7 +917,7 @@ def build_random_simulations(n_sim, n_leaf_range, cab_range, car_range, ant_rang
                                              param_bounds=param_bounds,
                                              distribution=distribution)
 
-    srf_file = os.path.join(SRF_FOLDER, sensor + ".txt")
+    srf_file = SRF_FOLDER / f"{sensor}.txt"
     srfs = np.genfromtxt(srf_file, dtype=None, names=True)
     srf = []
     wls_sensor = []
@@ -930,7 +927,7 @@ def build_random_simulations(n_sim, n_leaf_range, cab_range, car_range, ant_rang
         srf.append(srfs[band])
         wls_sensor.append(np.sum(wls * srfs[band]) / np.sum(srfs[band]))
 
-    soil_files = [os.path.join(SOIL_FOLDER, '%s.txt' % i) for i in soil_names]
+    soil_files = [SOIL_FOLDER / f'{i}.txt' for i in soil_names]
     soil_spectrum = build_soil_database(params_orig["bs"], soil_files)
     soil_spectrum = np.clip(soil_spectrum, 1e-3, 0.99)
     print("Computing spectral diffuse irradiance ratio using 6S")
@@ -942,9 +939,9 @@ def build_random_simulations(n_sim, n_leaf_range, cab_range, car_range, ant_rang
                                                       WLS_SIM,
                                                       soil_spectrum,
                                                       skyl=skyl,
-                                                      sza=np.full(n_simulations, sza),
-                                                      vza=np.full(n_simulations, vza),
-                                                      psi=np.full(n_simulations, psi),
+                                                      sza=sza,
+                                                      vza=vza,
+                                                      psi=psi,
                                                       srf=srf,
                                                       outfile=None,
                                                       calc_FAPAR=False,
@@ -955,9 +952,10 @@ def build_random_simulations(n_sim, n_leaf_range, cab_range, car_range, ant_rang
 
     params = pd.DataFrame(params)
     result = pd.concat([params, rho_canopy_vec], axis=1)
-    out_file = os.path.join(OUTPUT_FOLDER, f"prosail_simulations_{sensor}.csv")
-    if not os.path.isdir(OUTPUT_FOLDER):
-        os.makedirs(OUTPUT_FOLDER)
+    out_file = OUTPUT_FOLDER / f"prosail_simulations_{sensor}.csv"
+    if not OUTPUT_FOLDER.is_dir():
+        OUTPUT_FOLDER.mkdir(parents=True)
+        
     result.to_csv(out_file)
     print('Simulations saved in %s'%out_file)
     
