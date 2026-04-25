@@ -128,7 +128,7 @@ u\left(z\right) =\frac{u_*}{k}\left[\log\left(\frac{z - d}{z_{0M}}\right)\right]
 :::
 
 :::{note} Nota
-This logarithmic wind attenuation is closely related to the aerodynamic resistance. 
+Esta atenuación del viento está muy rellacionada con la resistencia aerodinámica.
 :::
 
 :::{seealso} Ver también
