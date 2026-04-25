@@ -582,7 +582,7 @@ def plot_flux_variation(values, le, le_c, le_pm, le_fao, t_c, t_s, t_0,
     axs[2].legend()
     axs[0].set_ylabel("ET (mm / day)$)")
     axs[0].set_ylim(ET_LIMS)
-    axs[1].set_ylabel("T/ET")
+    axs[1].set_ylabel("Proporción ET")
     axs[1].set_ylim((0, 1))
     axs[2].set_ylabel("T$_x$ - T$_a$ (K)")
     axs[2].set_ylim(DELTA_T_LIMS)
