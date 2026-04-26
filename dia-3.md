@@ -12,6 +12,37 @@ Para poder acceder a los datos Copernicus (imágenes Sentinel, datos meteorológ
 * `Opcional pero recomendado` CDSE JupyterHub: [](https://jupyterhub.dataspace.copernicus.eu/hub)
 * `Opcional` OpenEO platform: [](https://docs.openeo.cloud/join/free_trial.html)
 
+### Instalación en el JupyterHub del Ecosistema de Datos Copernicus [Recomendado]
+Al ejecutarse en el [entorno JupyterHub de CDSE](https://jupyterhub.dataspace.copernicus.eu), las descargas de datos se minimizan, ya que los datos y el cómputo se encuentran en la misma infraestructura de nube.
+
+1. Accede a [https://jupyterhub.dataspace.copernicus.eu](https://jupyterhub.dataspace.copernicus.eu) e inicia un servidor.
+2. En el servidor, sube los cuadernos manualmente o clona este repositorio abriendo una terminal y ejecutando:
+    ```
+    git clone https://github.com/hectornieto/microcredencial-uclm.git mystorage/microcredencial
+    ```
+    
+3. Instala todas las librerías requeridas usando los siguientes comandos en una terminal
+    ```bash
+    cd mystorage/microcredencial
+    conda activate geo    
+    pip install -r requirements.txt
+    ```  
+4. Ejecuta los cuadernos usando un kernel que tenga GDAL instalado, p. ej. *Geo science*. Este paquete se instala en la primera celda de los cuadernos.
+
+:::{warning} Aviso
+ Deberías poder ejecutar los cuadernos sin ninguna configuración adicional si usas un kernel con GDAL instalado, pero a veces pueden surgir conflictos con paquetes existentes en el entorno. En ese caso, se recomienda hacer una instalación limpia del kernel siguiendo los pasos a continuación.
+1. Crea un nuevo kernel limpio usando los siguientes comandos en una terminal de Jupyterhub:
+    ```
+    conda create -n gdal_env python=3.11 \
+    conda activate gdal_env \
+    conda install -c conda-forge gdal \
+    pip install senet_toolbox@git+https://github.com/DHI/Sen-ET-OpenEO-toolbox.git \
+    python -m ipykernel install --user --name=gdal_env --display-name "Sen-ET Kernel" 
+    ```
+2. Ahora puedes seleccionar el kernel "Sen-ET Kernel" para ejecutar los cuadernos.
+:::
+
+
 ### Instalación en local [Opcional]
 En caso de que quieras instalar el material en tu ordenador personal debes tener los siguientes programas instalados:
 
