@@ -48,7 +48,8 @@ project:
         - file: ./201-ES_turbulencia_y_calor_sensible.md
     - file: dia-3.md
       children:
-        - file: ./301-ES_parametros_biofisicos.md
+        - file: ./301a-ES_parametros_biofisicos.md
+        - file: ./301b-ES_parametros_biofisicos.md
         - file: ./302-ES_SenET-OpenEO.md
     
   settings:
