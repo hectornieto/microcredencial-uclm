@@ -26,8 +26,28 @@ keywords: myst, markdown, open-science, tseb
 ---
 
 # Introducción
-Este repositorio contiene el material online necesario para ejecutar los cuadernos digitales (**Jupyter Notebook**) desarrollados para el curso.
+Este libro digital (*Jupyter Notebook*) contiene el material online necesario para cursar la parte `Teledetección aplicada a la restauración de espacios naturales` de la `Microcredencial en Inteligencia Artificial y Tecnologías Geoespaciales aplicadas a la Restauración de Ecosistemas Forestales afectados por incendios y sequías extremas`.
 
+# Registro en servicios gratuitos
+Para poder acceder a los datos Copernicus (imágenes Sentinel, datos meteorológicos del ECMWF y otros productos auxiliares) debes registrarte en las siguientes plataformas:
+
+* Copernicus Data Space Ecosystem: [](https://dataspace.copernicus.eu/)
+* European Center for Medium-Range Weather Forecast: [](https://www.ecmwf.int/user/login)
+* `Opcional pero recomendado` CDSE JupyterHub: [](https://jupyterhub.dataspace.copernicus.eu/hub)
+* `Opcional` OpenEO platform: [](https://docs.openeo.cloud/join/free_trial.html)
+
+# Temario
+:::{include} ./microcredencial-UCLM_curriculum.md
+
+:::
+
+# Entregables
+Cada estudiante delimitará una o varias zonas de interés donde ejecutarán los cudadernos digitales de la sesión práctica [](dia-3.md). 
+
+Para el caso prácico `1` el alumnado podrá escoger entre generar imágenes mensuales o extraer series temporales (o ambas).
+
+* Pequeño informe (1-2 páginas) con los resultados y conclusiones más relevantes de cada una de las dos prácticas.
+* Exporta cada uno de los cuadernos digitales en formato `pdf` y entrégalos junto con el informe.
 
 # Instalación en local
 En caso de que quieras instalar el material en tu ordenador personal:
@@ -40,7 +60,7 @@ Debes tener los siguientes programas instalados:
 * [Git](https://git-scm.com/downloads)
 :::
 
-## Instala todas las librerías requeridas:
+## Instala todas las librerías requeridas
 
 Abre un terminal y navega a la carpeta donde hayas descargado `microcredencial-UCLM`:
 
@@ -114,10 +134,6 @@ jupyter book start
 Abre tu navegador esta URL: [`http://localhost:3000`](http://localhost:3000)
 
 
-# Contenido
-:::{include} ./microcredencial-UCLM_curriculum.md
-
-:::
 
 # Licencia
 Creative Commons Attribution-ShareAlike 4.0 International.

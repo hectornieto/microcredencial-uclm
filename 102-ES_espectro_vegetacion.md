@@ -295,7 +295,7 @@ $$NDWI = \frac{\rho_{NIR} - \rho_{SWIR}}{\rho_{NIR} + \rho_{SWIR}}$$
 Esta misma formulación es utilizada por el NBR (Normalized Burn Ratio) que en algunos estudios se utiliza para evaluar la severidad de un incendio
 :::
 
-Las simulaciones se han guardado en un archivo prosail_simulations.csv en la carpeta [./mystorage/102-prosail_and_spectra](/mystorage/102-prosail_and_spectra/{eval}`f"prosail_simulations_{fn.w_sensor.value}.txt"`). Descargate este archivo y calcula distintos índices de vegetación e intenta desarrollar relaciones y modelos estadísticos entre las bandas o índices de vegetación y los parámetros biofísicos. Para ello puedes usar cualquier software con el que estés habituado a trabajar (Excel, R, SPSS, ...).
+Las simulaciones se han guardado en un archivo prosail_simulations.csv en la carpeta [./mystorage/102-prosail_and_spectra/{eval}`f"prosail_simulations_{fn.w_sensor.value}.txt"`](./mystorage/102-prosail_and_spectra/{eval}`f"prosail_simulations_{fn.w_sensor.value}.txt"`). Descargate este archivo y calcula distintos índices de vegetación e intenta desarrollar relaciones y modelos estadísticos entre las bandas o índices de vegetación y los parámetros biofísicos. Para ello puedes usar cualquier software con el que estés habituado a trabajar (Excel, R, SPSS, ...).
 
 Puedes realizar tantas simulaciones como consideres necesarias,  por ejemplo variando el sensor o modificando los rangos plausibles para cubrir distintos tipos funcionales de vegetación. Tan sólo ten en cuenta que cada vez que se genere una simulación el archivo csv se sobreesecribirá. **Por lo que descárcatelo o haz una copia en tu carpeta virtual antes de volver a ejectura las nuevas simulaciones**.
 

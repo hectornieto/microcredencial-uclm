@@ -1,7 +1,5 @@
 (tseb-workshop)=
-# TSEB workshop
-
-Sessions will include lectures on the topic based on interactive textbooks/exercises using Jupyter Books   
+# Teledetección aplicada a la restauración de espacios naturales
 
 1. Rasgos biofísicos de la vegetación asociado a la interceptación y absorción de radiación (2.5 horas).
     
@@ -14,7 +12,9 @@ Sessions will include lectures on the topic based on interactive textbooks/exerc
 
 3. Ejercicios (2 horas)
     
-    1. [Caso práctico: Extracción de series temporales de rasgos biofísicos](./301-ES_parametros_biofisicos.md)
+    1. [Caso práctico: Extracción de información temporales de rasgos biofísicos]
+        1. Generación de imágenes mensuales de rasgos biofísicos (./301a-ES_parametros_biofisicos.md)
+        2. Generación de series temporales de rasgos biofísicos (./301b-ES_parametros_biofisicos.md)
     2. [Caso práctico: Estimación de ET fusionando imágenes Sentinel](./302-ES_SenET-OpenEO.md)
 
 
