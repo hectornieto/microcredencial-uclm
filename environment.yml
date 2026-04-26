@@ -5,6 +5,8 @@ channels:
 dependencies:
     - python=3.11
     - gdal
+    - rasterio
+    - rasterstats
     - jupyter
     - notebook
     - jupyterlab
@@ -17,6 +19,7 @@ dependencies:
     - numpy
     - scipy
     - pandas
+    - geopandas
     - statsmodels
     - matplotlib
     - plotly
