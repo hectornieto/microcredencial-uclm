@@ -1,0 +1,49 @@
+<VRTDataset rasterXSize="983" rasterYSize="984">
+  <SRS dataAxisToSRSAxisMapping="2,1">GEOGCS["WGS 84",DATUM["WGS_1984",SPHEROID["WGS 84",6378137,298.257223563,AUTHORITY["EPSG","7030"]],AUTHORITY["EPSG","6326"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AXIS["Latitude",NORTH],AXIS["Longitude",EAST],AUTHORITY["EPSG","4326"]]</SRS>
+  <GeoTransform> -1.7001343148869665e+00,  2.0360600675481462e-04,  0.0000000000000000e+00,  3.8500158722841071e+01,  0.0000000000000000e+00, -2.0360600675481649e-04</GeoTransform>
+  <VRTRasterBand dataType="Float32" band="1">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">TSEB-PT_20230510.data/TSEB-PT_20230510_R_n1.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="983" RasterYSize="984" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="983" ySize="984" />
+      <DstRect xOff="0" yOff="0" xSize="983" ySize="984" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="2">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">TSEB-PT_20230510.data/TSEB-PT_20230510_H1.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="983" RasterYSize="984" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="983" ySize="984" />
+      <DstRect xOff="0" yOff="0" xSize="983" ySize="984" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="3">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">TSEB-PT_20230510.data/TSEB-PT_20230510_LE1.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="983" RasterYSize="984" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="983" ySize="984" />
+      <DstRect xOff="0" yOff="0" xSize="983" ySize="984" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="4">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">TSEB-PT_20230510.data/TSEB-PT_20230510_G1.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="983" RasterYSize="984" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="983" ySize="984" />
+      <DstRect xOff="0" yOff="0" xSize="983" ySize="984" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="5">
+    <SimpleSource>
+      <SourceFilename relativeToVRT="1">TSEB-PT_20230510.data/TSEB-PT_20230510_ET_day.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="983" RasterYSize="984" DataType="Float32" BlockXSize="512" BlockYSize="512" />
+      <SrcRect xOff="0" yOff="0" xSize="983" ySize="984" />
+      <DstRect xOff="0" yOff="0" xSize="983" ySize="984" />
+    </SimpleSource>
+  </VRTRasterBand>
+</VRTDataset>
