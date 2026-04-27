@@ -70,13 +70,13 @@ project:
     
   exports:
     - format: typst
-      template: plain_typst_book
-      typst-header: ./typst_macros.typ
+      template: plain_typst_book 
       output: microcredencial-teledeteccion.pdf
       cover: ./input/figures/logo_main.png
       logo: ./input/figures/logo_main.png
       logo_width: 40
       Logoposition: right
+
       article:
         - file: intro.md
         - file: ./101-ES_radiacion_neta.ipynb
@@ -84,10 +84,7 @@ project:
         - file: ./201-ES_turbulencia_y_calor_sensible.ipynb
         - file: dia-3.md
     - format: cff
-    
-  math:
-    "\\downarrow": "arrow.b"
-    "\\uparrow": "arrow.t"  
+ 
           
   bibliography: 
    - bibliografia.bib
