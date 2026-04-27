@@ -28,10 +28,6 @@ project:
           - CSIC
         orcid: 0000-0003-0815-842X
   funding: Este material didáctico ha sido desarrollado gracias al proyecto GRwater – Programa Prismas y Problemas de la Fundación BBVA 2023
-  github: https://github.com/hectornieto/microcredencial-UCLM
-  jupyter:
-    binder:
-      repo: https://github.com/hectornieto/microcredencial-UCLM
   open_access: true
   license:
     content: CC-BY-4.0
@@ -43,8 +39,7 @@ project:
         - file: ./102-ES_espectro_vegetacion.ipynb
 
     - file: dia-2.md
-      children:
-        
+      children:        
         - file: ./201-ES_turbulencia_y_calor_sensible.ipynb
     - file: dia-3.md
       children:
@@ -63,13 +58,37 @@ project:
       Programa Prismas y Problemas de la Fundación BBVA 2023
   Options:
     logo: ./input/figures/logo_main.png
+
+  github: https://github.com/hectornieto/microcredencial-UCLM
+  jupyter:
+    execute: true
+    binder:
+      repo: https://github.com/hectornieto/microcredencial-UCLM
   settings:
     output_matplotlib_strings: remove
     output_stderr: remove-warn 
-     
+    
   exports:
-    - format: pdf
+    - format: typst
       template: plain_typst_book
+      typst-header: ./typst_macros.typ
+      output: microcredencial-teledeteccion.pdf
+      cover: ./input/figures/logo_main.png
+      logo: ./input/figures/logo_main.png
+      logo_width: 40
+      Logoposition: right
+      article:
+        - file: intro.md
+        - file: ./101-ES_radiacion_neta.ipynb
+        - file: ./102-ES_espectro_vegetacion.ipynb
+        - file: ./201-ES_turbulencia_y_calor_sensible.ipynb
+        - file: dia-3.md
+    - format: cff
+    
+  math:
+    "\\downarrow": "arrow.b"
+    "\\uparrow": "arrow.t"  
+          
   bibliography: 
    - bibliografia.bib
 site:

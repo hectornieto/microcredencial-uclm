@@ -28,6 +28,8 @@ keywords: myst, markdown, open-science, tseb
 # Introducción
 Este libro digital (*Jupyter Notebook*) contiene el material online necesario para cursar la parte `Teledetección aplicada a la restauración de espacios naturales` de la `Microcredencial en Inteligencia Artificial y Tecnologías Geoespaciales aplicadas a la Restauración de Ecosistemas Forestales afectados por incendios y sequías extremas`.
 
+Puedes acceder at todo el contenido interactivo a través de este línk [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/hectornieto/microcredencial-uclm/HEAD)
+
 # Registro en servicios gratuitos
 Para poder acceder a los datos Copernicus (imágenes Sentinel, datos meteorológicos del ECMWF y otros productos auxiliares) debes registrarte en las siguientes plataformas:
 
