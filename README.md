@@ -19,10 +19,10 @@ No necesitas instalar nada, tan sólo accede a la aplicación [![Binder](https:/
 
 3. Ejercicios (2 horas)
 
-    1. [Caso práctico: Extracción de información temporales de rasgos biofísicos]
-        1. Generación de imágenes mensuales de rasgos biofísicos (./301a-ES_parametros_biofisicos.md)
-        2. Generación de series temporales de rasgos biofísicos (./301b-ES_parametros_biofisicos.md)
-    2. [Caso práctico: Estimación de ET fusionando imágenes Sentinel](./302-ES_SenET-OpenEO.md)
+    1. Caso práctico: Extracción de información temporales de rasgos biofísicos
+        * [Generación de imágenes mensuales de rasgos biofísicos](./301a-ES_parametros_biofisicos.ipynb)
+        * [Generación de series temporales de rasgos biofísicos](./301b-ES_parametros_biofisicos.ipynb)
+    2. [Caso práctico: Estimación de ET fusionando imágenes Sentinel](./302-ES_SenET-OpenEO.ipynb)
 
 ## Instalación en local
 En caso de que quieras instalar el material en tu ordenador personal debes tener los siguientes programas instalados:

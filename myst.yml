@@ -39,27 +39,37 @@ project:
     - file: intro.md
     - file: dia-1.md
       children:
-        - file: ./101-ES_radiacion_neta.md
-        - file: ./102-ES_espectro_vegetacion.md
+        - file: ./101-ES_radiacion_neta.ipynb
+        - file: ./102-ES_espectro_vegetacion.ipynb
 
     - file: dia-2.md
       children:
         
-        - file: ./201-ES_turbulencia_y_calor_sensible.md
+        - file: ./201-ES_turbulencia_y_calor_sensible.ipynb
     - file: dia-3.md
       children:
-        - file: ./301a-ES_parametros_biofisicos.md
-        - file: ./301b-ES_parametros_biofisicos.md
-        - file: ./302-ES_SenET-OpenEO.md
-    
+        - file: ./301a-ES_parametros_biofisicos.ipynb
+        - file: ./301b-ES_parametros_biofisicos.ipynb
+        - file: ./302-ES_SenET-OpenEO.ipynb
+  
+  parts:
+    abstract: | 
+      Este libro digital (*Jupyter Notebook*) contiene el material online necesario para cursar 
+      la parte `Teledetección aplicada a la restauración de espacios naturales` de la 
+      `Microcredencial en Inteligencia Artificial y Tecnologías Geoespaciales aplicadas a la 
+      Restauración de Ecosistemas Forestales afectados por incendios y sequías extremas`.
+    acknowledgements: |
+      Este material didáctico ha sido desarrollado gracias al proyecto GRwater – 
+      Programa Prismas y Problemas de la Fundación BBVA 2023
+  Options:
+    logo: ./input/figures/logo_main.png
   settings:
     output_matplotlib_strings: remove
     output_stderr: remove-warn 
      
   exports:
     - format: pdf
-      template: lapreprint-typst
-      articles: intro.md
+      template: plain_typst_book
   bibliography: 
    - bibliografia.bib
 site:
