@@ -1,9 +1,42 @@
-cff-version: 1.1.0
-message: "If you use this theaching material, please cite it as below."
+cff-version: 1.2.0
+message: Please cite the following works when using this project.
+abstract: >-
+  Este libro digital (Jupyter Notebook) contiene el material online necesario
+  para cursar
+
+  la parte Teledetección aplicada a la restauración de espacios naturales de la
+
+  Microcredencial en Inteligencia Artificial y Tecnologías Geoespaciales
+  aplicadas a la  Restauración de Ecosistemas Forestales afectados por incendios
+  y sequías extremas.
+title: Teledetección aplicada a la restauración de espacios naturales
 authors:
   - family-names: Nieto
-    given-names: Hector
-    orcid: https://orcid.org/0000-0003-4250-6424
-title: microcredencial-UCLM: Microcredencial en Inteligencia Artificial y Tecnologías Geoespaciales aplicadas a la Restauración de Ecosistemas Forestales afectados por incendios y sequías extremas
-version: v1.0
-date-released: 2026-04-28
+    given-names: Héctor
+    affiliation: Instituto de Ciencias Agrarias
+    orcid: 0000-0003-4250-6424
+    email: hector.nieto@ica.csic.es
+  - family-names: Marimón
+    given-names: María Burguet
+    affiliation: Instituto de Ciencias Agrarias
+    orcid: 0000-0002-9748-8078
+  - family-names: Mary
+    given-names: Benjamin
+    affiliation: Instituto de Ciencias Agrarias
+    orcid: 0000-0003-0815-842X
+contact:
+  - family-names: Nieto
+    given-names: Héctor
+    affiliation: Instituto de Ciencias Agrarias
+    orcid: 0000-0003-4250-6424
+    email: hector.nieto@ica.csic.es
+keywords:
+  - MyST Markdown
+  - pyTSEB
+  - ProspectD
+  - 4SAIL
+  - Remote Sensing
+  - Copernicus
+license: CC-BY-4.0
+license-url: https://creativecommons.org/licenses/by/4.0/
+repository: https://github.com/hectornieto/microcredencial-UCLM
