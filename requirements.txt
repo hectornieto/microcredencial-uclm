@@ -1,4 +1,5 @@
 gdal
+netCDF4
 rasterio
 rasterstats
 jupyter
