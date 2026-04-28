@@ -1,5 +1,5 @@
 (tseb-workshop)=
-# Teledetección aplicada a la restauración de espacios naturales
+## Teledetección aplicada a la restauración de espacios naturales
 
 1. Rasgos biofísicos de la vegetación asociado a la interceptación y absorción de radiación (2.5 horas).
     

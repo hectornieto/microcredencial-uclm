@@ -83,6 +83,7 @@ project:
         - file: ./102-ES_espectro_vegetacion.ipynb
         - file: ./201-ES_turbulencia_y_calor_sensible.ipynb
         - file: dia-3.md
+          title: Prácticas
     - format: cff
  
           
