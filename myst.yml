@@ -46,6 +46,7 @@ project:
         - file: ./301a-ES_parametros_biofisicos.ipynb
         - file: ./301b-ES_parametros_biofisicos.ipynb
         - file: ./302-ES_SenET-OpenEO.ipynb
+        - file: ./303-ES_Severidad.ipynb
   
   parts:
     abstract: | 

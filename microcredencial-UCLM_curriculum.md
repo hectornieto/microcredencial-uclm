@@ -19,7 +19,7 @@
         
     2. [Caso práctico: Estimación de ET fusionando imágenes Sentinel](./302-ES_SenET-OpenEO.ipynb)
 
-
+    3. [Caso práctico: Evaluación de la severidad de un incencio forestal](./303-ES_Severidad.ipynb)
 
 
 

@@ -59,6 +59,7 @@ Y seguir las instrucciones descritas en [](./intro.md)
     
 2. [Caso práctico: Estimación de ET fusionando imágenes Sentinel](./302-ES_SenET-OpenEO.ipynb)
 
+3. [Caso práctico: Evaluación de la severidad de un incencio forestal](./303-ES_Severidad.ipynb)
 
 ## Ejercicio
 Cada estudiante delimitará una o varias zonas de interés donde ejecutarán los cudadernos digitales. Para el caso práciico 1 el alumnado podrá escoger entre generar imágenes mensuales o extraer series temporales (o ambas).
