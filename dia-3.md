@@ -16,18 +16,25 @@ Para poder acceder a los datos Copernicus (imágenes Sentinel, datos meteorológ
 Al ejecutarse en el [entorno JupyterHub de CDSE](https://jupyterhub.dataspace.copernicus.eu), las descargas de datos se minimizan, ya que los datos y el cómputo se encuentran en la misma infraestructura de nube.
 
 1. Accede a [https://jupyterhub.dataspace.copernicus.eu](https://jupyterhub.dataspace.copernicus.eu) e inicia un servidor.
+
 2. En el servidor, sube los cuadernos manualmente o clona este repositorio abriendo una terminal y ejecutando:
-    ```
-    git clone https://github.com/hectornieto/microcredencial-uclm.git mystorage/microcredencial
+    ```bash
+    git clone https://github.com/hectornieto/microcredencial-uclm.git ~/mystorage/microcredencial
     ```
     
 3. Instala todas las librerías requeridas usando los siguientes comandos en una terminal
     ```bash
-    cd mystorage/microcredencial
+    cd ~/mystorage/microcredencial
     conda activate geo    
     pip install -r requirements.txt
-    ```  
-4. Ejecuta los cuadernos usando un kernel que tenga GDAL instalado, p. ej. *Geo science*. Este paquete se instala en la primera celda de los cuadernos.
+    ```
+
+4. Desde el mismo terminal, copia todo el contenido de la carpeta `mystorage/microcredencial/mystorage` en la carpeta principal `mystorage`
+    ```bash
+    cp -r ~/mystorage/microcredencial/mystorage/* ~/mystorage/
+    ```
+    
+5. Ejecuta los cuadernos usando el kernel con tenga GDAL instalado, *Geo science*. 
 
 :::{warning} Aviso
  Deberías poder ejecutar los cuadernos sin ninguna configuración adicional si usas un kernel con GDAL instalado, pero a veces pueden surgir conflictos con paquetes existentes en el entorno. En ese caso, se recomienda hacer una instalación limpia del kernel siguiendo los pasos a continuación.
@@ -37,9 +44,9 @@ Al ejecutarse en el [entorno JupyterHub de CDSE](https://jupyterhub.dataspace.co
     conda activate gdal_env \
     conda install -c conda-forge gdal \
     pip install senet_toolbox@git+https://github.com/DHI/Sen-ET-OpenEO-toolbox.git \
-    python -m ipykernel install --user --name=gdal_env --display-name "Sen-ET Kernel" 
+    python -m ipykernel install --user --name=gdal_env --display-name "UCLM Kernel" 
     ```
-2. Ahora puedes seleccionar el kernel "Sen-ET Kernel" para ejecutar los cuadernos.
+2. Ahora puedes seleccionar el kernel "UCLM Kernel" para ejecutar los cuadernos.
 :::
 
 
