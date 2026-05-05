@@ -53,7 +53,7 @@ Instala los requisition bien con pip o crea un ambiente virtual con `conda/mamba
 
 * pip
 ```{code} bash
-pip install ./
+pip install -r requirements.txt
 ```
 
 * conda
