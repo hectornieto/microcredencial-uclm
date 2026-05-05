@@ -9,6 +9,7 @@ nodejs
 mystmd
 jupyterlab-myst
 jupyter-book>=2
+jupytext
 webp
 numpy
 scipy

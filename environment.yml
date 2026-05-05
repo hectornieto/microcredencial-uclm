@@ -16,6 +16,7 @@ dependencies:
     - mystmd
     - jupyterlab-myst
     - jupyter-book>=2
+    - jupytext
     - libwebp
     - numpy
     - scipy
